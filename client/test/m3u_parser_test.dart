@@ -45,10 +45,9 @@ https://cdn.example/live/u/p/3.ts
     });
 
     test('una entrada sin group-title cae al grupo por defecto', () {
-      final r = const M3uParser().parse('''#EXTM3U
-#EXTINF:-1,Sin grupo
-https://cdn.example/live/u/p/9.ts
-''');
+      final r = const M3uParser().parse('#EXTM3U\n'
+          '#EXTINF:-1,Sin grupo\n'
+          'https://cdn.example/live/u/p/9.ts\n');
       expect(r.entries, hasLength(1));
       expect(r.entries[0].group, 'Sin categoría');
     });
@@ -60,14 +59,49 @@ https://cdn.example/live/u/p/9.ts
     });
 
     test('ignora líneas que no son #EXTINF ni URL', () {
-      final r = const M3uParser().parse('''#EXTM3U
-#EXTVLCOPT:algo=raro
-# un comentario
-#EXTINF:-1,Ok
-https://cdn.example/live/u/p/1.ts
-''');
+      final r = const M3uParser().parse('#EXTM3U\n'
+          '#EXTVLCOPT:algo=raro\n'
+          '# un comentario\n'
+          '#EXTINF:-1,Ok\n'
+          'https://cdn.example/live/u/p/1.ts\n');
       expect(r.entries, hasLength(1));
       expect(r.entries[0].title, 'Ok');
+    });
+  });
+
+  group('robustez del resolver (TDD)', () {
+    test('tolera BOM UTF-8 al inicio sin marcar "falta cabecera"', () {
+      final r =
+          const M3uParser().parse('\u{FEFF}#EXTM3U\n#EXTINF:-1,A\nhttps://x/1.ts\n');
+      expect(r.entries, hasLength(1));
+      expect(r.errors, isEmpty);
+    });
+
+    test('deduplica URLs repetidas (misma URL = un solo canal)', () {
+      final r = const M3uParser().parse('#EXTM3U\n'
+          '#EXTINF:-1,Dup\n'
+          'https://x/1.ts\n'
+          '#EXTINF:-1,Dup otra vez\n'
+          'https://x/1.ts\n');
+      expect(r.entries, hasLength(1));
+    });
+
+    test('EXTVLCOPT mapea User-Agent y Referer a entry.headers', () {
+      final r = const M3uParser().parse('#EXTM3U\n'
+          '#EXTINF:-1,Con cabeceras\n'
+          '#EXTVLCOPT:http-user-agent=MiAgent/1.0\n'
+          '#EXTVLCOPT:http-referrer=https://origen.example/\n'
+          'https://x/1.ts\n');
+      expect(r.entries[0].headers['User-Agent'], 'MiAgent/1.0');
+      expect(r.entries[0].headers['Referer'], 'https://origen.example/');
+    });
+
+    test('EXTGRP gana sobre group-title (comportamiento VLC)', () {
+      final r = const M3uParser().parse('#EXTM3U\n'
+          '#EXTINF:-1 group-title="DelAttr",Uno\n'
+          '#EXTGRP:DelExtGrp\n'
+          'https://x/1.ts\n');
+      expect(r.entries[0].group, 'DelExtGrp');
     });
   });
 

@@ -80,6 +80,10 @@ class M3uParser {
       return M3uParseResult(entries: entries, groups: groups, errors: ['lista vacía']);
     }
 
+    // Tolerancia a BOM UTF-8: algunos paneles lo preponden y, si no se quita,
+    // la primera línea no empieza por '#EXTM3U' y se marcaba un error espurio.
+    if (body.startsWith('\uFEFF')) body = body.substring(1);
+
     final lines = const LineSplitter().convert(body);
     if (!lines.any((l) => l.trim().toUpperCase().startsWith('#EXTM3U'))) {
       errors.add('falta la cabecera #EXTM3U — se intenta parsear igualmente');
@@ -91,6 +95,7 @@ class M3uParser {
     String pendingTvg = '';
     int pendingDuration = -1;
     final pendingHeaders = <String, String>{};
+    final seenUrls = <String>{};
 
     void resetPending() {
       pendingTitle = null;
@@ -164,6 +169,13 @@ class M3uParser {
       }
 
       // Es una URL: cierra la entrada pendiente.
+      // Dedupe: algunos paneles repiten la misma URL en varias categorías;
+      // sin esto el listado mostraría el mismo canal dos veces.
+      if (!seenUrls.add(line)) {
+        resetPending();
+        continue;
+      }
+
       final title = (pendingTitle == null || pendingTitle!.isEmpty)
           ? _titleFromUrl(line)
           : pendingTitle!;

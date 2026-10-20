@@ -174,6 +174,15 @@ check "nosniff header set"            "nosniff" "$(curl -sS -m 10 -D - -o /dev/n
 check "player_api is no-store"        "no-store" "$(curl -sS -m 10 -D - -o /dev/null "$API" | tr -d '\r' | awk -F': ' 'tolower($1)=="cache-control"{print $2}')"
 check "no Server header leak"         "dramalive-reference-backend" "$(curl -sS -m 10 -D - -o /dev/null "$BASE/health" | tr -d '\r' | awk -F': ' 'tolower($1)=="server"{print $2}')"
 
+# ------------------------------------- resolver de canales: búsqueda (TDD)
+# Estos tests se escribieron ANTES de arreglar catalog.search(). Exponen tres
+# defectos del resolver: (1) no resuelve nombres de categoria, (2) matchea
+# campos internos (note) dando falsos positivos, (3) no pliega acentos.
+check "search por NOMBRE de categoria -> sus canales" "3" "$(curl -sS "$BASE/catalog/search?q=cartas" | jqpy "d['counts']['live']")"
+check "search NO matchea campos internos (note)"      "0" "$(curl -sS "$BASE/catalog/search?q=generado" | jqpy "d['counts']['live']")"
+check "search insensible a acentos y mayusculas"      "1" "$(curl -sS "$BASE/catalog/search?q=S%C3%8DNTEL" | jqpy "d['counts']['live']")"
+check "search por nombre de canal sigue funcionando"  "1" "$(curl -sS "$BASE/catalog/search?q=bunny" | jqpy "d['counts']['live']")"
+
 # ------------------------------------------------- real media (canal 9001)
 # El canal 9001 lleva media REAL generada por el repo (barras SMPTE H.264/AAC).
 # Debe anunciarse con codecs/resolución reales, playlist VOD y segmentos que SÍ

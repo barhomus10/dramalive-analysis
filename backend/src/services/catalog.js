@@ -188,14 +188,41 @@ function featured() {
 }
 
 function search(q) {
-  const needle = String(q || '').trim().toLowerCase();
+  const needle = fold(String(q || '').trim());
   if (!needle) return { live: [], vod: [], series: [] };
-  const has = (s) => JSON.stringify(s).toLowerCase().includes(needle);
+  const pick = (kind, list) => list.filter((s) => searchText(kind, s).includes(needle));
   return {
-    live: live().filter(has),
-    vod: vod().filter(has),
-    series: series().filter(has),
+    live: pick('live', live()),
+    vod: pick('vod', vod()),
+    series: pick('series', series()),
   };
+}
+
+/** minúsculas + sin diacríticos, para que "SÍNTEL" encuentre "Sintel". */
+function fold(s) {
+  return String(s == null ? '' : s)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function categoryName(kind, id) {
+  const hit = (categories(kind) || []).find(
+    (c) => String(c.category_id) === String(id),
+  );
+  return hit ? hit.category_name : '';
+}
+
+/**
+ * Texto buscable de una entrada: SOLO campos visibles para el usuario
+ * (nombre, categoría resuelta, id EPG/tvg, id de stream). Antes se matcheaba
+ * contra el JSON serializado completo, lo que daba falsos positivos con campos
+ * internos como `note` y no encontraba nada al buscar por nombre de categoría.
+ */
+function searchText(kind, s) {
+  return fold(
+    [s.name, s.title, categoryName(kind, s.category_id), s.epg_channel_id, s.stream_id].join(' '),
+  );
 }
 
 /**

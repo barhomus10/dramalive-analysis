@@ -217,7 +217,7 @@ curl -s 'localhost:8080/player_api.php?username=demo&password=demo&action=get_sh
 curl -sI 'localhost:8080/live/1001.m3u8'
 ```
 
-Suite de contrato: `backend/test.sh` (94 aserciones sobre forma, tipos, cabeceras y resolución de URIs relativas).
+Suite de contrato: `backend/test.sh` (98 aserciones sobre forma, tipos, cabeceras y resolución de URIs relativas).
 
 ---
 

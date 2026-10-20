@@ -133,7 +133,7 @@ make help                # todo lo que hay
 make backend             # → http://localhost:8080
 
 # 2. probarlo
-make test                # 94 aserciones sobre forma, tipos y cabeceras
+make test                # 98 aserciones sobre forma, tipos y cabeceras
 curl -s 'localhost:8080/player_api.php?username=demo&password=demo&action=get_live_streams'
 
 # 3. cliente web (backend + UI juntos, proxy en /backend)
@@ -218,7 +218,7 @@ catálogo — dilo y se ajusta el alcance.
 - [x] Triage del APK — manifiesto, firma, permisos, 102 componentes, inventario de SDKs
 - [x] Extracción de la config remota embebida (11 hosts, failover, `banned_apps`, ads, flags)
 - [x] 10 hallazgos de seguridad documentados con impacto y remediación
-- [x] Backend de referencia Xtream-compatible + HLS sintético + suite de contrato (94 aserciones, en verde)
+- [x] Backend de referencia Xtream-compatible + HLS sintético + suite de contrato (98 aserciones, en verde)
 - [x] Canal de prueba **REAL** (id 9001) que se reproduce de verdad en el navegador
       (HLS → hls.js → MSE), con barras SMPTE + tono generados por este repo — sin
       contenido de terceros
