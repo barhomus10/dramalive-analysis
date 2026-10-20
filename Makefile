@@ -42,44 +42,12 @@ backend-passthrough: ## Igual, pero proxifica los 'source' del catálogo propio 
 .PHONY: client-web
 client-web: ## Cliente web + backend en http://localhost:5173 (backend bajo /backend)
 	@command -v node >/dev/null || { echo "falta node >= 18"; exit 1; }
-	@echo "  backend  → /backend  (proxy a 127.0.0.1:$(API_PORT))"
-	@echo "  cliente  → /client/web/"
-	@echo "  abre     → http://localhost:$(WEB_PORT)/client/web/"
-	@$(MAKE) --no-print-directory _serve-web & \
-	 cd $(BACKEND) && PORT=$(API_PORT) HOST=127.0.0.1 node src/index.js
-
-.PHONY: _serve-web
-_serve-web:
-	@node -e ' \
-	  const http=require("http"),fs=require("fs"),path=require("path"),url=require("url"); \
-	  const ROOT=process.cwd(), PORT=Number(process.env.WEB_PORT||5173), API=Number(process.env.PORT||8080); \
-	  const MIME={".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8", \
-	    ".css":"text/css; charset=utf-8",".json":"application/json; charset=utf-8", \
-	    ".svg":"image/svg+xml",".png":"image/png",".m3u8":"application/vnd.apple.mpegurl", \
-	    ".ts":"video/mp2t",".md":"text/markdown; charset=utf-8",".txt":"text/plain; charset=utf-8"}; \
-	  http.createServer((req,res)=>{ \
-	    const p=url.parse(req.url).pathname; \
-	    if(p==="/backend"||p.startsWith("/backend/")){ \
-	      const t=p.replace(/^\/backend/,"")||"/"; \
-	      const q=url.parse(req.url).query; \
-	      const opts={host:"127.0.0.1",port:API,path:t+(q?"?"+q:""),method:req.method,headers:req.headers}; \
-	      delete opts.headers.host; \
-	      const up=http.request(opts,(r)=>{res.writeHead(r.statusCode,r.headers);r.pipe(res)}); \
-	      up.on("error",(e)=>{res.writeHead(502,{"Content-Type":"text/plain"});res.end("backend caído: "+e.message)}); \
-	      req.pipe(up); return; } \
-	    let f=path.join(ROOT,decodeURIComponent(p)); \
-	    if(!f.startsWith(ROOT)){res.writeHead(403);return res.end("fuera del repo")} \
-	    if(fs.existsSync(f)&&fs.statSync(f).isDirectory())f=path.join(f,"index.html"); \
-	    if(!fs.existsSync(f)){res.writeHead(404,{"Content-Type":"text/plain"});return res.end("404 "+p)} \
-	    res.writeHead(200,{"Content-Type":MIME[path.extname(f)]||"application/octet-stream"}); \
-	    fs.createReadStream(f).pipe(res); \
-	  }).listen(PORT,"0.0.0.0",()=>console.log("  web      → http://0.0.0.0:"+PORT+"/client/web/")); \
-	' WEB_PORT=$(WEB_PORT) PORT=$(API_PORT)
+	@WEB_PORT=$(WEB_PORT) API_PORT=$(API_PORT) node backend/dev-server.js
 
 # --------------------------------------------------------------------- test
 
 .PHONY: test
-test: ## Suite de contrato del backend (~60 aserciones)
+test: ## Suite de contrato del backend (85 aserciones)
 	@cd $(BACKEND) && bash test.sh
 
 .PHONY: check

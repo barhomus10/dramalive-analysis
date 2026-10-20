@@ -22,8 +22,14 @@ const TS_BYTES_PER_SEG = Math.round((SEG_SECONDS * 188 * 1024) / 8); // ~ rough,
 
 /**
  * Media playlist for a channel. Live (sliding window) unless `vod` is set.
+ *
+ * Segment URIs are RELATIVE (`../../segments/<id>-<i>.ts`). Absolute URLs
+ * derived from the Host header break whenever the backend sits behind a proxy
+ * or a preview tunnel: the playlist would tell the player to fetch
+ * `http://127.0.0.1:8080/...`, which is unreachable from the user's browser.
+ * Relative URIs resolve against the playlist URL and work everywhere.
  */
-function mediaPlaylist(streamId, { baseUrl, vod = false } = {}) {
+function mediaPlaylist(streamId, { vod = false } = {}) {
   const stream = catalog.findStream(streamId);
   const name = stream ? stream.name : `channel ${streamId}`;
   const lines = ['#EXTM3U', '#EXT-X-VERSION:3'];
@@ -40,7 +46,8 @@ function mediaPlaylist(streamId, { baseUrl, vod = false } = {}) {
   const count = vod ? SEG_PER_PLAYLIST : SEG_PER_PLAYLIST;
   for (let i = 0; i < count; i++) {
     lines.push(`#EXTINF:${SEG_SECONDS}.000,`);
-    lines.push(`${baseUrl}/segments/${streamId}-${i}.ts`);
+    // desde /hls/<id>/index.m3u8 → /segments/<id>-<i>.ts
+    lines.push(`../../segments/${streamId}-${i}.ts`);
   }
   if (vod) lines.push('#EXT-X-ENDLIST');
 
@@ -52,7 +59,7 @@ function mediaPlaylist(streamId, { baseUrl, vod = false } = {}) {
  * the media playlist directly) because that is what real panels do and clients
  * commonly branch on it.
  */
-function masterPlaylist(streamId, { baseUrl } = {}) {
+function masterPlaylist(streamId, { relPrefix = '../' } = {}) {
   const stream = catalog.findStream(streamId);
   const audioOnly = stream && /audio|tone|radio/i.test(stream.name || '');
   const codecs = audioOnly ? 'mp4a.40.2' : 'avc1.4d401f,mp4a.40.2';
@@ -62,7 +69,11 @@ function masterPlaylist(streamId, { baseUrl } = {}) {
     '#EXTM3U',
     '#EXT-X-VERSION:3',
     `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},${resolution}CODECS="${codecs}",NAME="referencia"`,
-    `${baseUrl}/hls/${streamId}/index.m3u8`,
+    // URI relativa a la playlist maestra. La profundidad DEPENDE de la ruta:
+    //   /live/<user>/<pass>/<id>.m3u8   → 3 niveles  → ../../../hls/…
+    //   /live/<id>.m3u8                 → 1 nivel    → ../hls/…
+    // El caller calcula relPrefix; ver routes/hls.js.
+    `${relPrefix}hls/${streamId}/index.m3u8`,
     '',
   ].join('\n');
 }
@@ -101,3 +112,4 @@ function escapeAttr(s) {
 }
 
 module.exports = { mediaPlaylist, masterPlaylist, segment, SEG_SECONDS };
+

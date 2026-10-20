@@ -133,7 +133,7 @@ make help                # todo lo que hay
 make backend             # → http://localhost:8080
 
 # 2. probarlo
-make test                # ~60 aserciones sobre forma y tipos
+make test                # 85 aserciones sobre forma, tipos y cabeceras
 curl -s 'localhost:8080/player_api.php?username=demo&password=demo&action=get_live_streams'
 
 # 3. cliente web (backend + UI juntos, proxy en /backend)
@@ -213,7 +213,7 @@ catálogo — dilo y se ajusta el alcance.
 - [x] Triage del APK — manifiesto, firma, permisos, 102 componentes, inventario de SDKs
 - [x] Extracción de la config remota embebida (11 hosts, failover, `banned_apps`, ads, flags)
 - [x] 10 hallazgos de seguridad documentados con impacto y remediación
-- [x] Backend de referencia Xtream-compatible + HLS sintético + suite de contrato (~60 aserciones, en verde)
+- [x] Backend de referencia Xtream-compatible + HLS sintético + suite de contrato (85 aserciones, en verde)
 - [x] Cliente réplica Flutter: 7 pantallas, 4 fuentes, reproductor, ajustes, aviso de cleartext
 - [x] Cliente web standalone para probar el contrato sin toolchain de Flutter
 - [x] Tarea y configuración listas para REA

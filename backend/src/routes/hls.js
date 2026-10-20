@@ -75,7 +75,14 @@ function proxy(req, res, target) {
 
 /* ------------------------------------------------------------------ routes */
 
-/** GET /live/:id.m3u8   (also /movie/:id.<ext>, /series/:id.<ext>) */
+/**
+ * GET /live/:id.m3u8   (también /live/<user>/<pass>/:id.m3u8, /movie/…, /series/…)
+ *
+ * La ruta Xtream estándar incluye usuario y contraseña como segmentos de path,
+ * así que la profundidad varía. Las URIs de la playlist son relativas (ver
+ * services/hls.js), por lo que hay que calcular cuántos niveles subir para
+ * llegar a la raíz del servicio.
+ */
 function stream(req, res, params) {
   const id = params.id;
   if (!id) return text(res, 400, 'missing stream id\n', 'text/plain', 'no-store');
@@ -88,9 +95,14 @@ function stream(req, res, params) {
   if (!catalog.knownStreamId(id)) {
     return text(res, 404, 'unknown stream id\n', 'text/plain; charset=utf-8', 'no-store');
   }
-  const isVod = req.url.startsWith('/movie/') || req.url.startsWith('/series/');
-  const body = hls.masterPlaylist(id, { baseUrl: baseUrl(req) });
-  void isVod; // master playlist is identical for both in this reference impl
+
+  // "/live/demo/demo/1001.m3u8" → ["", "live","demo","demo","1001.m3u8"]
+  // el archivo ocupa el último elemento; hay que subir (segmentos - 1) niveles.
+  const segments = req.url.split('?')[0].split('/').filter(Boolean);
+  const levels = Math.max(1, segments.length - 1);
+  const relPrefix = '../'.repeat(levels);
+
+  const body = hls.masterPlaylist(id, { relPrefix });
   return text(res, 200, body, 'application/vnd.apple.mpegurl; charset=utf-8', 'no-store');
 }
 

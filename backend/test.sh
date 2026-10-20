@@ -138,6 +138,16 @@ check "/live/9999.m3u8 -> 404"        "404"  "$(status "$BASE/live/9999.m3u8")"
 check "/segments/bogus.ts -> 400"     "400"  "$(status "$BASE/segments/bogus.ts")"
 check "/movie/2001.mp4 -> 200"        "200"  "$(status "$BASE/movie/2001.mp4")"
 
+# URIs relativas: si la API emite URLs absolutas derivadas del Host, el cliente
+# falla detrás de cualquier proxy o túnel de preview (regresión real encontrada
+# durante el desarrollo). Las playlists deben usar SOLO URIs relativas.
+check "master: ninguna URI absoluta"  "0"    "$(curl -sS "$BASE/live/1001.m3u8" | grep -cE '^https?://')"
+check "media: ninguna URI absoluta"   "0"    "$(curl -sS "$BASE/hls/1001/index.m3u8" | grep -cE '^https?://')"
+check "master 1 nivel -> ../hls/"     "../hls/1001/index.m3u8" "$(curl -sS "$BASE/live/1001.m3u8" | grep -v '^#' | head -1)"
+check "master 3 niveles (Xtream) -> ../../../hls/" "../../../hls/1001/index.m3u8" "$(curl -sS "$BASE/live/demo/demo/1001.m3u8" | grep -v '^#' | head -1)"
+check "media segments -> ../../segments/" "../../segments/1001-0.ts" "$(curl -sS "$BASE/hls/1001/index.m3u8" | grep -v '^#' | head -1)"
+check "ruta Xtream con user/pass -> 200" "200" "$(status "$BASE/live/demo/demo/1001.m3u8")"
+
 # ------------------------------------------------------------- discovery
 check "/config/remote -> 200"         "200"  "$(status "$BASE/config/remote")"
 check "config has serverSettingsModel" "True" "$(curl -sS "$BASE/config/remote" | jqpy "'serverSettingsModel' in d")"
