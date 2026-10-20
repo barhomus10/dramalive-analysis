@@ -206,3 +206,27 @@ Ya ejecutado: `analysis/scripts/apk_triage.sh dramalive.apk` →
 `analysis/evidence/apk-dramalive/`.
 
 Config de la sesión: `analysis/rea/rea.config.json`.
+
+---
+
+## Estado (actualizado 2026-10-20) — avance estático sin REA/Ghidra
+
+Se adelantó parte del objetivo de protocolo **solo con análisis estático** (androguard sobre
+el pool de cadenas y los campos de los modelos), sin descompilador y **sin tocar la red**:
+
+- **Hecho:** esquema JSON real de la config remota y de las fuentes por stream
+  (`docs/05-API.md` §6 y `analysis/evidence/apk-schema-genA.json`): sobre `SettingsModel`,
+  claves de `ServerSettingsModel`, el mecanismo `AdvancedUrl{url,agent,headers,acceptSSL}` /
+  `LiveModel{agent,backup,url}` / `XtreamModel`, esquema de update-forzada, ads/billing,
+  deportes, topics, chat XMPP y cache SQLite. Stack confirmado: sin Retrofit,
+  HttpURLConnection + okhttp3, Gson por nombre de campo, Smack.
+- **Hecho:** esquema de cifrado de la API propia: AES/CBC + PKCS5/PKCS7Padding
+  (`SecretKeySpec` + `IvParameterSpec`). Solo esquema; no se rompe ni se reproducen claves.
+- **Pendiente (requiere descompilador tipo jadx/Ghidra, ausente en este entorno):** la
+  construcción *exacta* de cada request en runtime (qué cabeceras se fijan por llamada, cómo
+  se deriva la clave/IV de AES, el orden de los pasos glt→glbr→advanced). Eso es lo que
+  justifican los objetivos 1 y 2 con REA; el esquema de arriba ya cubre la mayor parte del
+  valor de documentación.
+
+Se mantienen intactas las restricciones: estático, cero tráfico a los hosts prohibidos,
+nunca usar credenciales embebidas, redactar, sin PoC funcional.

@@ -1,0 +1,98 @@
+{
+  "_meta": {
+    "origen": "com.sneig.livedrama v13.0.3 (build 187) — generacion A, nativa Kotlin/Java",
+    "metodo": "Analisis ESTATICO del pool de cadenas y de los campos de las clases de modelo (Gson mapea por nombre de campo al no haber @SerializedName). androguard 4.1.4 sobre classes.dex/4/6/7.",
+    "garantias": [
+      "cero trafico de red a cualquier endpoint del producto",
+      "no se ejecuto la app ni se descompilo a Java legible",
+      "SOLO nombres de campo / claves JSON; ningun VALOR de credencial, host o token",
+      "hosts e IPs redactados donde aparecian"
+    ],
+    "nota": "Los nombres de campo que aluden a credenciales (crash_reporting_login, crash_reporting_password, admin_email) se listan aqui unicamente como ESQUEMA. Sus valores reales son el hallazgo F-01 y permanecen redactados."
+  },
+
+  "config_remota_sobre": {
+    "clase": "models.data.settings.SettingsModel",
+    "campos": ["adsModel", "appVersionModel", "fg_active", "mainServerModelArraylist", "modModel", "serverSettingsModel", "socialModelArraylist"],
+    "claves_adicionales_leidas_con_optString": ["FG", "TLS", "advanced", "all", "data", "url", "live_fav", "show_fav"]
+  },
+
+  "server_settings": {
+    "clase": "models.data.settings.ServerSettingsModel",
+    "comentario": "Es el mapa completo de la config remota embebida (ver embedded-remote-config.REDACTED.json). Estos nombres de campo SON las claves JSON del endpoint de configuracion.",
+    "campos": [
+      "server_url", "live_url", "sport_server_url", "redirect_url", "log_url",
+      "chat_http_url", "xmpp_ip", "file_server_url", "fgcode_url", "smart_search_url",
+      "business_url", "legal_url", "privacy_policy_url", "faqs_url", "tutorial_video",
+      "support_email", "admin_email", "admin_email_paid",
+      "crash_reporting_url", "crash_reporting_login", "crash_reporting_password",
+      "banned_apps"
+    ]
+  },
+
+  "actualizacion_forzada": {
+    "clase": "models.data.settings.AppVersionModel",
+    "campos": ["androidAppVersion", "app_version", "iosAppVersion", "forceUpdate", "update_url", "update_url_direct", "update_message", "update_message_ar", "update_message_fr"]
+  },
+
+  "ads_y_billing": {
+    "clase": "models.data.settings.AdsModel",
+    "campos": ["all_int", "time_int", "billing_available", "coupon_active", "coupon_available", "coupon_end_date", "home_ban", "home_nat", "live_ban", "live_nat", "sport_nat"]
+  },
+
+  "fuente_por_stream": {
+    "comentario": "Mecanismo a nivel de app para cada URL de stream: cabeceras HTTP propias, User-Agent propio y politica SSL. Es la base tecnica del hotlink-bypass y de la tolerancia a cleartext (hallazgo F-02).",
+    "AdvancedUrl": { "clase": "models.data.AdvancedUrl", "campos": ["url", "agent", "headers", "acceptSSL"] },
+    "LiveModel":   { "clase": "models.data.LiveModel",   "campos": ["url", "agent", "backup", "id_live", "id_topic", "img_url", "img_url_topic", "name", "name_topic", "type"] },
+    "BackupLiveModel": { "clase": "models.data.BackupLiveModel", "campos": ["url", "agent"] },
+    "XtreamModel": { "clase": "M3uPlayer.model.XtreamModel", "campos": ["url", "agent", "autoRefresh", "acceptSSL"] }
+  },
+
+  "deportes": {
+    "clase": "models.data.MatchModel",
+    "campos": ["id", "title", "topic", "channel", "date", "url", "firstTeam", "firstTeamImage", "firstTeamScore", "secondtTeam", "secondtTeamImage", "secondtTeamScore"]
+  },
+
+  "topics_y_favoritos": {
+    "TopicModel": { "clase": "models.data.TopicModel", "campos": ["id_topic", "name_topic", "img_url_topic"] },
+    "NotificationTopic": { "clase": "models.data.NotificationTopic", "campos": ["id", "title", "state"] }
+  },
+
+  "chat_xmpp": {
+    "comentario": "Esquema del chat sobre XMPP (Smack). Ver objetivo REA 09-CHAT-XMPP.",
+    "MyInfoModel": { "campos": ["id", "name", "email", "gender", "created_at", "api_key", "password"] },
+    "RoomModel": { "campos": ["id", "name", "description", "image", "topic", "maxOccupants", "numOccupants", "isPasswordProtected"] },
+    "MessageModel": { "campos": ["id", "text", "image", "voice", "createdAt", "receiver", "deliveryReceiptId", "isSentSuccess", "userModel", "roomModel"] },
+    "UserModel": { "campos": ["id", "name", "gender"] }
+  },
+
+  "cache_local_sqlite": {
+    "comentario": "Tablas locales donde la app cosecha topics/lives (cache offline). No es protocolo de red.",
+    "tablas": ["topics", "lives"],
+    "consultas_observadas": [
+      "SELECT * FROM lives WHERE id_topic = ? ORDER BY order_id DESC",
+      "SELECT * FROM lives WHERE type = ? AND id_topic LIKE '%' || ? || '%'",
+      "SELECT * FROM topics WHERE type = ?",
+      "UPDATE lives Set order_id = ? WHERE id_live = ? AND id_topic = ?"
+    ]
+  },
+
+  "constantes_de_fuente": {
+    "comentario": "Verbos/clave de almacenamiento del modelo de fuentes (coincide con docs/04).",
+    "valores": ["ACTIVATE_FG", "ACTIVATE_XTREAM", "KEY_XTREAM_SETTINGS", "FG", "FG_Topic", "Global_Topic"]
+  },
+
+  "cripto_observada": {
+    "comentario": "Esquema de cifrado de los payloads de la API propia. Se documenta el ESQUEMA, no se rompe ni se reproducen claves.",
+    "algoritmos": ["AES/CBC/PKCS5PADDING", "AES/CBC/PKCS7PADDING"],
+    "clases_java": ["javax.crypto.Cipher", "javax.crypto.spec.SecretKeySpec", "javax.crypto.spec.IvParameterSpec"],
+    "digests": ["MD5", "SHA-256"]
+  },
+
+  "stack_http": {
+    "retrofit": false,
+    "clientes": ["java.net.HttpURLConnection", "okhttp3 (classes7.dex)"],
+    "json": ["org.json", "com.google.gson (mapeo por nombre de campo)"],
+    "xmpp": ["org.jivesoftware.smack (classes4/6/8.dex)"]
+  }
+}

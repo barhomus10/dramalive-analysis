@@ -218,3 +218,81 @@ curl -sI 'localhost:8080/live/1001.m3u8'
 ```
 
 Suite de contrato: `backend/test.sh` (94 aserciones sobre forma, tipos, cabeceras y resolución de URIs relativas).
+
+---
+
+## 6. Protocolo REAL del APK (generación A) — extraído estáticamente
+
+> **Método y límites.** Todo lo siguiente sale del **pool de cadenas y de los campos de las
+> clases de modelo** de `com.sneig.livedrama` v13.0.3/187, con `androguard` sobre
+> `classes.dex/4/6/7`. **No se contactó ningún endpoint**, no se ejecutó la app y no se
+> descompiló a Java legible. Como el APK usa **Gson sin `@SerializedName`**, el esquema JSON
+> coincide con los **nombres de campo** de sus modelos: leerlos es leer el contrato. Solo se
+> publican **nombres de campo / claves**, nunca valores de credenciales, hosts o tokens
+> (ver `analysis/evidence/apk-schema-genA.json`).
+
+### 6.1 Sobre de configuración remota
+
+`SettingsModel` es la envolvente que la app descarga al arrancar:
+
+```
+adsModel · appVersionModel · fg_active · mainServerModelArraylist ·
+modModel · serverSettingsModel · socialModelArraylist
+```
+
+con claves adicionales leídas vía `optString`: `FG`, `TLS`, `advanced`, `all`, `data`,
+`url`, `live_fav`, `show_fav`.
+
+`ServerSettingsModel` es el **mapa completo de servidores** (el mismo que aparece embebido
+en el DEX, hallazgo F-03/F-01). Sus nombres de campo *son* las claves JSON del endpoint de
+configuración:
+
+```
+server_url · live_url · sport_server_url · redirect_url · log_url ·
+chat_http_url · xmpp_ip · file_server_url · fgcode_url · smart_search_url ·
+business_url · legal_url · privacy_policy_url · faqs_url · tutorial_video ·
+support_email · admin_email · admin_email_paid ·
+crash_reporting_url · crash_reporting_login · crash_reporting_password · banned_apps
+```
+
+(Los tres últimos son el hallazgo **F-01**; aquí figuran solo como esquema.)
+
+### 6.2 Fuente por stream: el mecanismo de cabeceras/SSL
+
+La pieza técnicamente más relevante para entender por qué sus streams "funcionan" detrás de
+protecciones:
+
+| Modelo | Campos | Significado |
+|---|---|---|
+| `AdvancedUrl` | `url, agent, headers, acceptSSL` | Cada URL de stream lleva su propio **User-Agent**, sus **cabeceras HTTP** y su **política SSL**. |
+| `LiveModel` | `url, agent, backup, id_live, id_topic, …` | Entrada de canal con UA propio y URL de **respaldo**. |
+| `BackupLiveModel` | `url, agent` | Respaldo con UA propio. |
+| `XtreamModel` | `url, agent, autoRefresh, acceptSSL` | Fuente Xtream/M3U con UA y refresco. |
+
+Es decir, el cliente inyecta **cabeceras y User-Agent por stream** y puede **aceptar SSL
+débil/cleartext por URL** (`acceptSSL`). Eso es, a nivel de app, la base del hotlink-bypass y
+de la tolerancia a HTTP plano que documenta **F-02**. Este repo **no** reproduce ese
+mecanismo contra servicios ajenos: su backend de referencia y su cliente usan un único
+origen propio y TLS-friendly.
+
+### 6.3 Resto del esquema (resumen)
+
+- **Actualización forzada** (`AppVersionModel`): `app_version, forceUpdate, update_url,
+  update_url_direct, update_message[_ar|_fr]` → coincide con **F-04** (sideload).
+- **Ads/billing** (`AdsModel`): `billing_available, coupon_*, home_nat, live_nat,
+  sport_nat, *_ban, all_int, time_int` → los flags que la config pone en off (F-10).
+- **Deportes** (`MatchModel`): `id, title, topic, channel, date, url, firstTeam…,
+  secondtTeam…`.
+- **Topics/favoritos**: `TopicModel{id_topic,name_topic,img_url_topic}`.
+- **Chat XMPP** (`MyInfoModel, RoomModel, MessageModel, UserModel`) → objetivo REA
+  `09-CHAT-XMPP.md`.
+- **Cache local SQLite**: tablas `topics` y `lives` donde cosecha la lista offline.
+
+### 6.4 Cripto y stack HTTP (esquema, no explotación)
+
+- Cifrado de payloads de la API propia: **AES/CBC** con **PKCS5/PKCS7Padding**, vía
+  `Cipher` + `SecretKeySpec` + `IvParameterSpec`; digests MD5 y SHA-256. Se documenta el
+  esquema; **no** se reproducen claves ni se rompe el cifrado (sería elusión de una medida
+  tecnológica, fuera del alcance de este proyecto).
+- Stack: **sin Retrofit**; `HttpURLConnection` + `okhttp3`; JSON con `org.json` + **Gson por
+  nombre de campo**; XMPP con **Smack**.
