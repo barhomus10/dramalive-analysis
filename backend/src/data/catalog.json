@@ -1,123 +1,322 @@
 {
   "categories": {
     "live": [
-      { "category_id": "1", "category_name": "Libre / Dominio público", "parent_id": 0 },
-      { "category_id": "2", "category_name": "Cartas de ajuste", "parent_id": 0 },
-      { "category_id": "3", "category_name": "Radio", "parent_id": 0 }
+      {
+        "category_id": "1",
+        "category_name": "Libre / Dominio público",
+        "parent_id": 0
+      },
+      {
+        "category_id": "2",
+        "category_name": "Cartas de ajuste",
+        "parent_id": 0
+      },
+      {
+        "category_id": "3",
+        "category_name": "Radio",
+        "parent_id": 0
+      }
     ],
     "vod": [
-      { "category_id": "10", "category_name": "Cortos libres", "parent_id": 0 }
+      {
+        "category_id": "10",
+        "category_name": "Cortos libres",
+        "parent_id": 0
+      }
     ],
     "series": [
-      { "category_id": "20", "category_name": "Series de ejemplo", "parent_id": 0 }
+      {
+        "category_id": "20",
+        "category_name": "Series de ejemplo",
+        "parent_id": 0
+      }
     ]
   },
   "live": [
     {
-      "num": 1, "name": "Big Buck Bunny (HLS local)", "stream_type": "live", "stream_id": 1001,
-      "stream_icon": "", "epg_channel_id": "bbb.local", "category_id": "1",
-      "tv_archive": 0, "tv_archive_duration": 0,
+      "num": 1,
+      "name": "Big Buck Bunny (HLS local)",
+      "stream_type": "live",
+      "stream_id": 1001,
+      "stream_icon": "",
+      "epg_channel_id": "bbb.local",
+      "category_id": "1",
+      "tv_archive": 0,
+      "tv_archive_duration": 0,
       "note": "Generado por el backend: carta de ajuste + tono, segmentos .ts en memoria."
     },
     {
-      "num": 2, "name": "Sintel (HLS local)", "stream_type": "live", "stream_id": 1002,
-      "stream_icon": "", "epg_channel_id": "sintel.local", "category_id": "1",
-      "tv_archive": 1, "tv_archive_duration": 1
+      "num": 2,
+      "name": "Sintel (HLS local)",
+      "stream_type": "live",
+      "stream_id": 1002,
+      "stream_icon": "",
+      "epg_channel_id": "sintel.local",
+      "category_id": "1",
+      "tv_archive": 1,
+      "tv_archive_duration": 1
     },
     {
-      "num": 3, "name": "Colour bars 1080p50", "stream_type": "live", "stream_id": 1003,
-      "stream_icon": "", "epg_channel_id": "bars.local", "category_id": "2",
-      "tv_archive": 0, "tv_archive_duration": 0
+      "num": 3,
+      "name": "Colour bars 1080p50",
+      "stream_type": "live",
+      "stream_id": 1003,
+      "stream_icon": "",
+      "epg_channel_id": "bars.local",
+      "category_id": "2",
+      "tv_archive": 0,
+      "tv_archive_duration": 0
     },
     {
-      "num": 4, "name": "SMPTE + reloj", "stream_type": "live", "stream_id": 1004,
-      "stream_icon": "", "epg_channel_id": "smpte.local", "category_id": "2",
-      "tv_archive": 0, "tv_archive_duration": 0
+      "num": 4,
+      "name": "SMPTE + reloj",
+      "stream_type": "live",
+      "stream_id": 1004,
+      "stream_icon": "",
+      "epg_channel_id": "smpte.local",
+      "category_id": "2",
+      "tv_archive": 0,
+      "tv_archive_duration": 0
     },
     {
-      "num": 5, "name": "Tono 1 kHz (solo audio)", "stream_type": "live", "stream_id": 1005,
-      "stream_icon": "", "epg_channel_id": "tone.local", "category_id": "3",
-      "tv_archive": 0, "tv_archive_duration": 0
+      "num": 5,
+      "name": "Tono 1 kHz (solo audio)",
+      "stream_type": "live",
+      "stream_id": 1005,
+      "stream_icon": "",
+      "epg_channel_id": "tone.local",
+      "category_id": "3",
+      "tv_archive": 0,
+      "tv_archive_duration": 0
+    },
+    {
+      "stream_id": 9001,
+      "name": "Canal de prueba REAL (barras SMPTE + tono)",
+      "stream_type": "live",
+      "category_id": "2",
+      "num": 9001,
+      "stream_icon": "",
+      "epg_channel_id": "testpattern.local",
+      "tv_archive": 0,
+      "tv_archive_duration": 0,
+      "note": "Media REAL generada por este repo (ffmpeg: smptehdbars 640x360 + seno 1kHz, H.264 Baseline + AAC). Se reproduce de verdad en el navegador vía hls.js. Contenido propio, no de terceros."
     }
   ],
   "vod": [
     {
-      "num": 1, "name": "Elephants Dream (2006, Blender)", "stream_type": "movie", "stream_id": 2001,
-      "stream_icon": "", "category_id": "10", "container_extension": "mp4",
-      "rating": "7.0", "plot": "Primer corto open movie de la Blender Foundation. CC-BY.",
+      "num": 1,
+      "name": "Elephants Dream (2006, Blender)",
+      "stream_type": "movie",
+      "stream_id": 2001,
+      "stream_icon": "",
+      "category_id": "10",
+      "container_extension": "mp4",
+      "rating": "7.0",
+      "plot": "Primer corto open movie de la Blender Foundation. CC-BY.",
       "source": "https://download.blender.org/ED/ED_1280.avi"
     },
     {
-      "num": 2, "name": "Big Buck Bunny (2008, Blender)", "stream_type": "movie", "stream_id": 2002,
-      "stream_icon": "", "category_id": "10", "container_extension": "mp4",
-      "rating": "8.0", "plot": "CC-BY 3.0. Se usa como fuente del canal 1001.",
+      "num": 2,
+      "name": "Big Buck Bunny (2008, Blender)",
+      "stream_type": "movie",
+      "stream_id": 2002,
+      "stream_icon": "",
+      "category_id": "10",
+      "container_extension": "mp4",
+      "rating": "8.0",
+      "plot": "CC-BY 3.0. Se usa como fuente del canal 1001.",
       "source": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
     },
     {
-      "num": 3, "name": "Sintel (2010, Blender)", "stream_type": "movie", "stream_id": 2003,
-      "stream_icon": "", "category_id": "10", "container_extension": "mp4",
-      "rating": "7.6", "plot": "CC-BY 3.0.",
+      "num": 3,
+      "name": "Sintel (2010, Blender)",
+      "stream_type": "movie",
+      "stream_id": 2003,
+      "stream_icon": "",
+      "category_id": "10",
+      "container_extension": "mp4",
+      "rating": "7.6",
+      "plot": "CC-BY 3.0.",
       "source": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
     },
     {
-      "num": 4, "name": "Tears of Steel (2012, Blender)", "stream_type": "movie", "stream_id": 2004,
-      "stream_icon": "", "category_id": "10", "container_extension": "mp4",
-      "rating": "6.5", "plot": "CC-BY 3.0.",
+      "num": 4,
+      "name": "Tears of Steel (2012, Blender)",
+      "stream_type": "movie",
+      "stream_id": 2004,
+      "stream_icon": "",
+      "category_id": "10",
+      "container_extension": "mp4",
+      "rating": "6.5",
+      "plot": "CC-BY 3.0.",
       "source": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8"
     }
   ],
   "series": [
     {
-      "series_id": 3001, "name": "Arquitectura de una app IPTV", "cover": "", "category_id": "20",
+      "series_id": 3001,
+      "name": "Arquitectura de una app IPTV",
+      "cover": "",
+      "category_id": "20",
       "plot": "Serie didáctica ficticia generada por este backend. Cada episodio es una carta de ajuste distinta.",
-      "genre": "Técnico", "rating": "9.0", "releaseDate": "2026",
+      "genre": "Técnico",
+      "rating": "9.0",
+      "releaseDate": "2026",
       "seasons": [
-        { "season_number": 1, "name": "Temporada 1", "episode_count": 3 },
-        { "season_number": 2, "name": "Temporada 2", "episode_count": 2 }
+        {
+          "season_number": 1,
+          "name": "Temporada 1",
+          "episode_count": 3
+        },
+        {
+          "season_number": 2,
+          "name": "Temporada 2",
+          "episode_count": 2
+        }
       ]
     }
   ],
   "series_episodes": {
     "3001": {
       "1": [
-        { "id": "40001", "episode_num": 1, "title": "Fuentes: Xtream, M3U, FG y GitHub", "info": { "duration": "00:06:00" }, "stream_id": 4001, "container_extension": "m3u8" },
-        { "id": "40002", "episode_num": 2, "title": "El reproductor: HLS, DASH y DRM", "info": { "duration": "00:06:00" }, "stream_id": 4002, "container_extension": "m3u8" },
-        { "id": "40003", "episode_num": 3, "title": "Chat XMPP sobre Smack", "info": { "duration": "00:06:00" }, "stream_id": 4003, "container_extension": "m3u8" }
+        {
+          "id": "40001",
+          "episode_num": 1,
+          "title": "Fuentes: Xtream, M3U, FG y GitHub",
+          "info": {
+            "duration": "00:06:00"
+          },
+          "stream_id": 4001,
+          "container_extension": "m3u8"
+        },
+        {
+          "id": "40002",
+          "episode_num": 2,
+          "title": "El reproductor: HLS, DASH y DRM",
+          "info": {
+            "duration": "00:06:00"
+          },
+          "stream_id": 4002,
+          "container_extension": "m3u8"
+        },
+        {
+          "id": "40003",
+          "episode_num": 3,
+          "title": "Chat XMPP sobre Smack",
+          "info": {
+            "duration": "00:06:00"
+          },
+          "stream_id": 4003,
+          "container_extension": "m3u8"
+        }
       ],
       "2": [
-        { "id": "40004", "episode_num": 1, "title": "Config remota y kill-switches", "info": { "duration": "00:06:00" }, "stream_id": 4004, "container_extension": "m3u8" },
-        { "id": "40005", "episode_num": 2, "title": "Seguridad: por qué HTTP plano es un problema", "info": { "duration": "00:06:00" }, "stream_id": 4005, "container_extension": "m3u8" }
+        {
+          "id": "40004",
+          "episode_num": 1,
+          "title": "Config remota y kill-switches",
+          "info": {
+            "duration": "00:06:00"
+          },
+          "stream_id": 4004,
+          "container_extension": "m3u8"
+        },
+        {
+          "id": "40005",
+          "episode_num": 2,
+          "title": "Seguridad: por qué HTTP plano es un problema",
+          "info": {
+            "duration": "00:06:00"
+          },
+          "stream_id": 4005,
+          "container_extension": "m3u8"
+        }
       ]
     }
   },
   "epg": {
     "1001": [
-      { "title": "Bucle continuo — Big Buck Bunny", "description": "Carta de inicio + segmentos generados." },
-      { "title": "Prueba de bitrate", "description": "Verificación del buffer del reproductor." }
+      {
+        "title": "Bucle continuo — Big Buck Bunny",
+        "description": "Carta de inicio + segmentos generados."
+      },
+      {
+        "title": "Prueba de bitrate",
+        "description": "Verificación del buffer del reproductor."
+      }
     ],
     "1002": [
-      { "title": "Sintel — bloque 1", "description": "Catch-up habilitado (tv_archive=1, 1 día)." },
-      { "title": "Sintel — bloque 2", "description": "" }
+      {
+        "title": "Sintel — bloque 1",
+        "description": "Catch-up habilitado (tv_archive=1, 1 día)."
+      },
+      {
+        "title": "Sintel — bloque 2",
+        "description": ""
+      }
     ],
     "1003": [
-      { "title": "Colour bars", "description": "Barras de color EBU 100/0/100/0." }
+      {
+        "title": "Colour bars",
+        "description": "Barras de color EBU 100/0/100/0."
+      }
     ],
     "1004": [
-      { "title": "SMPTE con reloj", "description": "Patrón SMPTE y contador de tiempo." }
+      {
+        "title": "SMPTE con reloj",
+        "description": "Patrón SMPTE y contador de tiempo."
+      }
     ],
     "1005": [
-      { "title": "Tono 1 kHz", "description": "Solo audio. Útil para probar la ruta de audio." }
+      {
+        "title": "Tono 1 kHz",
+        "description": "Solo audio. Útil para probar la ruta de audio."
+      }
     ]
   },
   "featured": [
     {
-      "id": "hero-1", "type": "hero", "title": "Backend de referencia",
+      "id": "hero-1",
+      "type": "hero",
+      "title": "Backend de referencia",
       "subtitle": "Contrato Xtream Codes estándar, sin infraestructura de terceros",
-      "cta": "Reproducir canal 1001", "stream_id": 1001
+      "cta": "Reproducir canal 1001",
+      "stream_id": 1001
     },
-    { "id": "row-live", "type": "row", "title": "En directo", "kind": "live", "items": [1001, 1002, 1003, 1004, 1005] },
-    { "id": "row-vod", "type": "row", "title": "Cortos libres", "kind": "vod", "items": [2001, 2002, 2003, 2004] },
-    { "id": "row-series", "type": "row", "title": "Series", "kind": "series", "items": [3001] }
+    {
+      "id": "row-live",
+      "type": "row",
+      "title": "En directo",
+      "kind": "live",
+      "items": [
+        1001,
+        1002,
+        1003,
+        1004,
+        1005
+      ]
+    },
+    {
+      "id": "row-vod",
+      "type": "row",
+      "title": "Cortos libres",
+      "kind": "vod",
+      "items": [
+        2001,
+        2002,
+        2003,
+        2004
+      ]
+    },
+    {
+      "id": "row-series",
+      "type": "row",
+      "title": "Series",
+      "kind": "series",
+      "items": [
+        3001
+      ]
+    }
   ],
   "accounts": {
     "demo": {
@@ -126,7 +325,10 @@
       "exp_date": "1893456000",
       "is_trial": "0",
       "max_connections": "2",
-      "allowed_output_formats": ["m3u8", "ts"]
+      "allowed_output_formats": [
+        "m3u8",
+        "ts"
+      ]
     }
   }
 }

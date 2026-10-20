@@ -445,3 +445,37 @@ Los literales dan el mapa de servidores pero no el **protocolo**: qué paths con
 de `/api/live/livedrama/v13.0.0/`, qué cabeceras de autenticación, qué esquema JSON. Eso
 vive en el código de `com.sneig.livedrama` (probablemente OkHttp/Retrofit + Gson) y se
 extrae con descompilación. Ver `docs/06-FLUJO-REA.md` para la tarea lista para REA.
+
+---
+
+## F-11 · Ecosistema de clones white-label (ℹ️ contexto, no un hallazgo de Drama)
+
+El hallazgo F-09 (`banned_apps`, 25 paquetes) indica que la plantilla de Drama Live se
+clona en cadena. Para dimensionar el ecosistema se auditó **estáticamente** un repositorio
+público que se autodefine como «cliente al estilo de DramaLive»
+(`youcefyakhoo/PelisLatino-Android`, Java, ~288 archivos, creado 2026-10).
+
+> **Alcance de esta auditoría:** solo lectura del código público. **No se ejecutó** contra
+> Drama Live ni contra ningún otro servicio, **no se reprodujo su método de extracción** y
+> **no se publican aquí hosts, claves ni tráfico capturado** (se redactan). El objetivo es
+> documentar el ecosistema y sus riesgos, no proveer un how-to.
+
+Clases de falla observadas en ese clon (referencias a archivos, sin secretos):
+
+| # | Clase | Evidencia (redactada) |
+|---|-------|-----------------------|
+| a | **Tráfico real y vectores de clave de terceros commiteados** a git | `app/src/test/resources/drama_*_real.bin`, `docs/vectores-clave-*.json` trackeados, pese a que el `.gitignore` sí tiene sección de secretos |
+| b | **Elusión de cifrado del servicio** (AES/CryptoJS revertido para leer su tráfico) | `assets/drama_auto.js` (AES propio), lado Java con `SecretKeySpec` + KDF tipo OpenSSL |
+| c | **Sesión aprendida en claro** + `allowBackup=true` con reglas de backup por defecto (sin excluir nada) | `DramaSesion.java` (`SharedPreferences`), `AndroidManifest.xml`, `res/xml/backup_rules.xml` |
+| d | **WebView remoto con puente JS** expuesto a la página cargada | `DramaAutoActivity.java` (`setJavaScriptEnabled`, `addJavascriptInterface`, `@JavascriptInterface`) |
+| e | **Canal de control sobre relay público** sin auth real (topic como único secreto) | `tools/puente-ntfy.py` |
+| f | **Spoofing de Referer/Origin/User-Agent** por host para saltar protección de hotlink | `tools/api-canales/server.mjs`, `Encabezados.java` |
+| g | **Tráfico abusivo** al objetivo documentado por ellos mismos («98 req en 13 s») | comentario en `assets/drama_auto.js` |
+| h | **Licencia incorrecta** (OFL-1.1, de tipografías, aplicada a una app) y `targetSdk` por detrás de Play | `LICENSE`, `app/build.gradle` |
+
+**Conclusión para este proyecto:** esas fallas (a–g) son la consecuencia directa de extraer
+contenido real de un servicio ajeno. `dramalive-analysis` las evita **por diseño**: no
+commitea tráfico de terceros, no revierte cifrados ajenos, no guarda sesiones, no hace
+puentes WebView de captura, no tunelea control por relays públicos y no spoofea cabeceras.
+La reproducción real que ofrece este repo (canal 9001) usa **únicamente contenido generado
+por el propio repo**. Ver `docs/00-LEGAL-Y-ALCANCE.md` §4.

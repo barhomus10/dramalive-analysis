@@ -111,3 +111,14 @@ Thumbs.db
 /tmp/
 *.log
 analysis/evidence/apk-*/01-INVENTARIO.md.bak
+
+# ── Excepciones intencionales (SÍ se versionan) ──────────────────────────────
+# Media de prueba generada por ESTE repo (barras SMPTE + tono, ffmpeg). Es
+# contenido propio, no de terceros: hace que el canal 9001 se reproduzca de
+# verdad en el navegador. ~440 KB.
+!backend/media/
+!backend/media/**
+# hls.js vendorizado (Apache-2.0) + su aviso de licencia, para que Chromium
+# reproduzca HLS sin depender de una CDN (la preview no tiene red externa).
+!client/web/vendor/
+!client/web/vendor/**

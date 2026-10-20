@@ -69,7 +69,7 @@ echo
 check "GET /health -> 200"            "200"  "$(status "$BASE/health")"
 check "health.ok is true"             "True" "$(curl -sS "$BASE/health" | jqpy "d['ok']")"
 check "health reports passthrough"    "False" "$(curl -sS "$BASE/health" | jqpy "d['passthrough']")"
-check "catalog has 5 live streams"    "5"    "$(curl -sS "$BASE/health" | jqpy "d['catalog']['live']")"
+check "catalog has 6 live streams"    "6"    "$(curl -sS "$BASE/health" | jqpy "d['catalog']['live']")"
 
 # ------------------------------------------------------------------- auth
 check "no credentials -> 401"         "401"  "$(status "$BASE/player_api.php")"
@@ -95,9 +95,9 @@ check "series_categories -> 200"      "200"  "$(status "$API&action=get_series_c
 
 # ---------------------------------------------------------------- streams
 check "live_streams -> 200"           "200"  "$(status "$API&action=get_live_streams")"
-check "5 live streams"                "5"    "$(curl -sS "$API&action=get_live_streams" | jqpy "len(d)")"
+check "6 live streams"                "6"    "$(curl -sS "$API&action=get_live_streams" | jqpy "len(d)")"
 check "stream_id is an INT"           "int"  "$(curl -sS "$API&action=get_live_streams" | jqpy "type(d[0]['stream_id']).__name__")"
-check "filter by category_id=2 -> 2"  "2"    "$(curl -sS "$API&action=get_live_streams&category_id=2" | jqpy "len(d)")"
+check "filter by category_id=2 -> 3"  "3"    "$(curl -sS "$API&action=get_live_streams&category_id=2" | jqpy "len(d)")"
 check "filter unknown cat -> 0"       "0"    "$(curl -sS "$API&action=get_live_streams&category_id=999" | jqpy "len(d)")"
 check "vod_streams -> 4"              "4"    "$(curl -sS "$API&action=get_vod_streams" | jqpy "len(d)")"
 check "vod has container_extension"   "mp4"  "$(curl -sS "$API&action=get_vod_streams" | jqpy "d[0]['container_extension']")"
@@ -173,6 +173,29 @@ check "ACAO header is *"              "*"    "$(curl -sS -m 10 -D - -o /dev/null
 check "nosniff header set"            "nosniff" "$(curl -sS -m 10 -D - -o /dev/null "$BASE/health" | tr -d '\r' | awk -F': ' 'tolower($1)=="x-content-type-options"{print $2}')"
 check "player_api is no-store"        "no-store" "$(curl -sS -m 10 -D - -o /dev/null "$API" | tr -d '\r' | awk -F': ' 'tolower($1)=="cache-control"{print $2}')"
 check "no Server header leak"         "dramalive-reference-backend" "$(curl -sS -m 10 -D - -o /dev/null "$BASE/health" | tr -d '\r' | awk -F': ' 'tolower($1)=="server"{print $2}')"
+
+# ------------------------------------------------- real media (canal 9001)
+# El canal 9001 lleva media REAL generada por el repo (barras SMPTE H.264/AAC).
+# Debe anunciarse con codecs/resolución reales, playlist VOD y segmentos que SÍ
+# contienen streams elementales (PAT/PMT), a diferencia de los sintéticos (nulos).
+npids() {  # nº de PIDs distintos en un segmento TS (nulo=1, real>1)
+  curl -sS -m 10 "$1" -o /tmp/_dla_seg.bin
+  python3 -c "
+b=open('/tmp/_dla_seg.bin','rb').read(); s=set()
+for i in range(0,len(b)-3,188):
+    if b[i]==0x47: s.add(((b[i+1]&0x1f)<<8)|b[i+2])
+print(len(s))
+"
+}
+check "9001 master codecs reales"     "avc1.42001e"        "$(curl -sS "$BASE/live/9001.m3u8" | grep -o 'avc1\.42001e')"
+check "9001 master RESOLUTION real"   "RESOLUTION=640x360" "$(curl -sS "$BASE/live/9001.m3u8" | grep -o 'RESOLUTION=640x360')"
+check "9001 media es VOD"             "VOD"                "$(curl -sS "$BASE/hls/9001/index.m3u8" | grep -o 'PLAYLIST-TYPE:VOD' | cut -d: -f2)"
+check "9001 media tiene ENDLIST"      "#EXT-X-ENDLIST"     "$(curl -sS "$BASE/hls/9001/index.m3u8" | grep -o '#EXT-X-ENDLIST')"
+check "9001 media 5 segmentos"        "5"                  "$(curl -sS "$BASE/hls/9001/index.m3u8" | grep -c '^#EXTINF')"
+check "9001 segmento real (>50KB)"    "89300"              "$(curl -sS -o /dev/null -w '%{size_download}' "$BASE/segments/9001-0.ts")"
+check "9001 segmento con streams elem. (PIDs>1)" "5"       "$(npids "$BASE/segments/9001-0.ts")"
+check "1001 sigue sintético (1 PID nulo)" "1"              "$(npids "$BASE/segments/1001-0.ts")"
+check "9001 en el catálogo live"      "True"              "$(curl -sS "$API&action=get_live_streams" | jqpy "any(s['stream_id']==9001 for s in d)")"
 
 # ---------------------------------------------------------------- summary
 echo

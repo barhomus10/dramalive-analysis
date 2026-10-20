@@ -123,11 +123,16 @@
           Cliente independiente construido a partir del análisis de Drama Live v13.0.3.
           No contiene código, assets ni contenido del producto original, y no consulta
           su infraestructura.<br><br>
-          El reproductor recibe <b>segmentos MPEG-TS sintéticos</b> del backend de
-          referencia: estructuralmente válidos, sin imagen decodificable. Es a propósito —
-          este proyecto no redistribuye contenido de terceros. Para imagen real, activa
-          <code>PASSTHROUGH=1</code> con contenido del que tengas licencia, o apunta una
-          M3U propia.
+          El catálogo mezcla dos tipos de canal:<br>
+          · <b>Canales sintéticos</b> (1001–1005): segmentos MPEG-TS generados en memoria,
+          estructuralmente válidos pero <i>sin imagen decodificable</i> — sirven para
+          ejercitar el pipeline HLS del cliente, no para mostrar video.<br>
+          · <b>Canal 9001 «Canal de prueba REAL»</b>: barras SMPTE + tono de 1 kHz
+          codificados en H.264/AAC por <i>este propio repo</i> (ffmpeg). Sí se reproduce
+          de verdad (hls.js + MSE). Contenido propio, no de terceros.<br><br>
+          Este proyecto no redistribuye contenido de terceros. Si quieres imagen real de
+          otra fuente, activa <code>PASSTHROUGH=1</code> apuntando el catálogo a un stream
+          del que tengas licencia, o carga una M3U propia.
         </div>
       </div>
     </div>
@@ -136,7 +141,7 @@
     <div>
       <div class="card">
         <h2>Reproductor</h2>
-        <video id="player" controls playsinline preload="none"></video>
+        <video id="player" controls playsinline preload="none" loop></video>
         <div class="st" id="stPlayer">Elige un canal.</div>
       </div>
 
@@ -164,6 +169,9 @@
   </footer>
 </div>
 
+<!-- hls.js (Apache-2.0, vendorizado en vendor/) para que Chromium reproduzca
+     HLS; Safari/iOS usan HLS nativo y no lo necesitan. Ver vendor/hls.js.LICENSE -->
+<script src="vendor/hls.min.js"></script>
 <script>
 (() => {
   'use strict';
@@ -346,30 +354,69 @@
 
   /* ------------------------------------------------------------------ play */
 
+  let hlsInst = null;
+
+  function setStatus(msg, cls) {
+    els.stPlayer.textContent = msg;
+    els.stPlayer.className = 'st' + (cls ? ' ' + cls : '');
+  }
+
   function play(id) {
     const c = channels.find((x) => String(x.stream_id) === String(id));
     if (!c) return;
     // Formato estándar Xtream. El backend de referencia ignora user/pass en la
     // ruta; un panel real los valida.
     const url = `${base()}/live/${encodeURIComponent(els.user.value)}/${encodeURIComponent(els.pass.value)}/${id}.m3u8`;
-    els.stPlayer.textContent = 'Cargando ' + c.name + ' …';
-    els.stPlayer.className = 'st';
-    els.player.src = url;
-    const p = els.player.play();
-    if (p && p.catch) p.catch((e) => {
-      els.stPlayer.textContent = 'El reproductor no pudo decodificar: ' + e.message +
-        '. Esperado con los segmentos sintéticos del backend de referencia.';
-      els.stPlayer.className = 'st err';
-    });
-    els.player.addEventListener('error', () => {
-      els.stPlayer.textContent = 'Error de reproducción en ' + url +
-        '. Los segmentos generados son estructuralmente válidos pero sin video decodificable (a propósito).';
-      els.stPlayer.className = 'st err';
-    }, { once: true });
-    els.player.addEventListener('playing', () => {
-      els.stPlayer.textContent = 'Reproduciendo: ' + c.name;
-      els.stPlayer.className = 'st ok';
-    }, { once: true });
+    const video = els.player;
+    // El canal 9001 lleva media REAL (barras SMPTE generadas por este repo);
+    // el resto son segmentos sintéticos nulos, sin video decodificable.
+    const isReal = String(id) === '9001';
+
+    // Destruir la instancia anterior para no apilar reproductores ni hooks.
+    if (hlsInst) { try { hlsInst.destroy(); } catch (_) {} hlsInst = null; }
+    video.removeAttribute('src');
+    try { video.load(); } catch (_) {}
+
+    setStatus('Cargando ' + c.name + ' …');
+    const onPlaying = () => setStatus('▶ Reproduciendo: ' + c.name + (isReal ? ' — media REAL' : ''), 'ok');
+    video.addEventListener('playing', onPlaying, { once: true });
+
+    function fail(reason) {
+      video.removeEventListener('playing', onPlaying);
+      if (isReal) {
+        setStatus('✗ El canal REAL no reprodujo: ' + reason, 'err');
+      } else {
+        setStatus('Sin imagen (' + reason + '). Esperado: los canales sintéticos ' +
+          'llevan segmentos nulos sin video decodificable. Elige el canal 9001 ' +
+          '"Canal de prueba REAL" para ver reproducción de verdad.', 'err');
+      }
+    }
+
+    if (window.Hls && window.Hls.isSupported()) {
+      // Chromium/Firefox: hls.js demuxea el TS y alimenta MSE.
+      hlsInst = new window.Hls({ debug: false, enableWorker: true });
+      hlsInst.loadSource(url);
+      hlsInst.attachMedia(video);
+      hlsInst.on(window.Hls.Events.MANIFEST_PARSED, () => {
+        const p = video.play();
+        if (p && p.catch) p.catch((e) => fail('autoplay bloqueado: ' + e.message));
+      });
+      hlsInst.on(window.Hls.Events.ERROR, (_evt, data) => {
+        if (!data || !data.fatal) return;
+        fail(data.type + '/' + data.details);
+        try { hlsInst.destroy(); } catch (_) {}
+        hlsInst = null;
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari/iOS: HLS nativo, sin librería.
+      video.src = url;
+      const p = video.play();
+      if (p && p.catch) p.catch((e) => fail(e.message));
+      video.addEventListener('error', () => fail('error de <video> nativo'), { once: true });
+    } else {
+      fail('este navegador no soporta HLS (ni hls.js ni nativo)');
+    }
+
     loadEpg(id);
   }
 

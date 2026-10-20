@@ -1,0 +1,25 @@
+{
+  "stream_id": 9001,
+  "kind": "live",
+  "codecs": "avc1.42001e,mp4a.40.2",
+  "resolution": "640x360",
+  "bandwidth": 120000,
+  "target_duration": 6,
+  "playlist_type": "VOD",
+  "durations": [
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0
+  ],
+  "segments": [
+    "9001-0.ts",
+    "9001-1.ts",
+    "9001-2.ts",
+    "9001-3.ts",
+    "9001-4.ts"
+  ],
+  "generated_by": "ffmpeg 7.0.2-static (imageio-ffmpeg) · smptehdbars 640x360@25 + sine 1kHz",
+  "note": "Canal de prueba REAL generado por este repo. Barras SMPTE + tono. Contenido propio, no de terceros."
+}

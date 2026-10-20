@@ -105,7 +105,7 @@ dramalive-analysis/
 ├── backend/                         API de referencia (Node ≥18, cero dependencias)
 │   ├── src/index.js                 routing, CORS, rate limit
 │   ├── src/routes/                  player_api.js · hls.js · discovery.js
-│   ├── src/services/                catalog.js · hls.js (segmentos .ts sintéticos)
+│   ├── src/services/                catalog.js · hls.js (sintéticos + media real local)
 │   ├── src/data/catalog.json        catálogo con contenido libre (Blender Foundation)
 │   └── test.sh                      suite de contrato, ~60 aserciones
 ├── client/                          réplica Flutter (Android + web)
@@ -133,11 +133,16 @@ make help                # todo lo que hay
 make backend             # → http://localhost:8080
 
 # 2. probarlo
-make test                # 85 aserciones sobre forma, tipos y cabeceras
+make test                # 94 aserciones sobre forma, tipos y cabeceras
 curl -s 'localhost:8080/player_api.php?username=demo&password=demo&action=get_live_streams'
 
 # 3. cliente web (backend + UI juntos, proxy en /backend)
 make client-web          # → http://localhost:5173/client/web/
+#    Ahí, el canal 9001 «Canal de prueba REAL» se REPRODUCE de verdad: barras
+#    SMPTE + tono codificados en H.264/AAC por este propio repo (ffmpeg),
+#    servidos como HLS y reproducidos con hls.js + MSE. Los canales 1001-1005
+#    siguen siendo sintéticos (sin imagen) a propósito, para ejercitar el
+#    pipeline sin redistribuir contenido de nadie.
 
 # 4. cliente Flutter
 cd client && flutter pub get && flutter run -d chrome
@@ -213,7 +218,10 @@ catálogo — dilo y se ajusta el alcance.
 - [x] Triage del APK — manifiesto, firma, permisos, 102 componentes, inventario de SDKs
 - [x] Extracción de la config remota embebida (11 hosts, failover, `banned_apps`, ads, flags)
 - [x] 10 hallazgos de seguridad documentados con impacto y remediación
-- [x] Backend de referencia Xtream-compatible + HLS sintético + suite de contrato (85 aserciones, en verde)
+- [x] Backend de referencia Xtream-compatible + HLS sintético + suite de contrato (94 aserciones, en verde)
+- [x] Canal de prueba **REAL** (id 9001) que se reproduce de verdad en el navegador
+      (HLS → hls.js → MSE), con barras SMPTE + tono generados por este repo — sin
+      contenido de terceros
 - [x] Cliente réplica Flutter: 7 pantallas, 4 fuentes, reproductor, ajustes, aviso de cleartext
 - [x] Cliente web standalone para probar el contrato sin toolchain de Flutter
 - [x] Tarea y configuración listas para REA
