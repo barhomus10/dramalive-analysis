@@ -1,0 +1,25 @@
+{
+  "name": "dramalive-reference-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dependency-free reference implementation of the Xtream Codes player_api.php contract, for the dramalive-analysis replica client.",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "bash test.sh",
+    "passthrough": "PASSTHROUGH=1 node src/index.js"
+  },
+  "keywords": [
+    "xtream-codes",
+    "iptv",
+    "hls",
+    "reference-implementation",
+    "reverse-engineering"
+  ],
+  "license": "MIT",
+  "dependencies": {}
+}

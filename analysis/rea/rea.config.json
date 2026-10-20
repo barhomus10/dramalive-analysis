@@ -1,0 +1,156 @@
+{
+  "$comment": "Configuración de la sesión de REA para el análisis del APK de Drama Live. Ver REA-TASK.md para la tarea completa y docs/06-FLUJO-REA.md para el procedimiento.",
+  "target": {
+    "artifact": "artifacts/apk/dramalive.apk",
+    "sha256": "a3ab61b5aaa6adf028358db75415158484500eee9ea36461d0605368e8f78d55",
+    "md5": "3954b8ccfcd72b87f096eeb9593bd34a",
+    "bytes": 30524011,
+    "type": "android-apk",
+    "package": "com.sneig.livedrama",
+    "versionName": "13.0.3",
+    "versionCode": 187,
+    "minSdk": 16,
+    "targetSdk": 34,
+    "dex_count": 8,
+    "abis": ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"]
+  },
+  "mode": "static-only",
+  "objectives": [
+    {
+      "id": 1,
+      "priority": "critical",
+      "title": "Cliente HTTP del backend propio",
+      "deliverable": "analysis/evidence/05-CLIENTE-HTTP.md",
+      "questions": [
+        "¿Qué paths se concatenan a server_url / live_url?",
+        "¿Qué cabeceras y parámetros de autenticación se envían?",
+        "¿Cuál es el esquema JSON de cada respuesta?",
+        "¿Cómo funciona el failover sobre mainServerModelArraylist?",
+        "¿Cómo se compone la URL de reproducción final?"
+      ]
+    },
+    {
+      "id": 2,
+      "priority": "high",
+      "title": "Remote config y kill-switches",
+      "deliverable": "analysis/evidence/06-REMOTE-CONFIG.md",
+      "questions": [
+        "¿Desde dónde y con qué frecuencia se refresca la config?",
+        "¿Semántica exacta de cada flag de adsModel y del valor 'nactive'?",
+        "¿Qué desbloquean billing_available / coupon_*?",
+        "¿Qué es modModel y qué se descarga desde mod_url?",
+        "¿Qué desactiva fg_active=false?"
+      ]
+    },
+    {
+      "id": 3,
+      "priority": "high",
+      "title": "Mecanismo banned_apps",
+      "deliverable": "analysis/evidence/07-BANNED-APPS.md",
+      "questions": [
+        "¿Se compara contra APPLICATION_ID, contra paquetes instalados, o ambos?",
+        "¿Qué hace la app al coincidir?",
+        "¿La lista se actualiza en remoto?"
+      ]
+    },
+    {
+      "id": 4,
+      "priority": "high",
+      "title": "Cadena de autoupdate",
+      "deliverable": "analysis/evidence/08-AUTOUPDATE.md",
+      "questions": [
+        "¿Cómo se verifica la integridad del APK descargado?",
+        "¿Se puede forzar la actualización desde remoto?",
+        "¿update_url vs update_url_direct?",
+        "¿Descarga e instala en segundo plano?"
+      ]
+    },
+    {
+      "id": 5,
+      "priority": "medium",
+      "title": "Chat XMPP (Smack)",
+      "deliverable": "analysis/evidence/09-CHAT-XMPP.md",
+      "questions": [
+        "¿Cómo se construye el JID y con qué SASL?",
+        "¿STARTTLS obligatorio u opcional?",
+        "¿Qué se persiste y cifrado?",
+        "¿Qué endpoints tiene chat_http_url?"
+      ]
+    },
+    {
+      "id": 6,
+      "priority": "medium",
+      "title": "Uso de criptografía",
+      "deliverable": "analysis/evidence/10-CRIPTO.md",
+      "questions": [
+        "¿Se cifran en reposo las credenciales del panel del usuario?",
+        "¿Por qué el build web lleva pointycastle y el APK no?",
+        "¿Hay firma de peticiones?"
+      ]
+    },
+    {
+      "id": 7,
+      "priority": "low",
+      "title": "Servicios y comportamiento en segundo plano",
+      "deliverable": "analysis/evidence/11-BACKGROUND.md",
+      "questions": [
+        "¿SwipOutService se relanza al arrancar el dispositivo?",
+        "¿Para qué se usa REQUEST_DELETE_PACKAGES?"
+      ]
+    }
+  ],
+  "constraints": {
+    "static_analysis_only": true,
+    "execute_target": false,
+    "network_access_to_target_hosts": false,
+    "forbidden_hosts": [
+      "eastgoessouth.online",
+      "*.eastgoessouth.online",
+      "mikkm.xyz",
+      "twoapistack.work",
+      "*.twoapistack.work",
+      "semprotech.online",
+      "dataflowstation.net",
+      "backendcoreapi.com",
+      "swiftapi.org",
+      "dramalive.app",
+      "dramalive.org",
+      "fgcode.org",
+      "fgcode.store"
+    ],
+    "do_not_use_embedded_credentials": true,
+    "redact_in_output": [
+      "credentials",
+      "tokens",
+      "infrastructure_ips",
+      "email_addresses",
+      "personal_data"
+    ],
+    "no_functional_exploit_poc": true,
+    "vulnerability_handling": "describe mechanism and impact; flag for responsible disclosure to support@dramalive.org; 90-day embargo"
+  },
+  "known_context": {
+    "embedded_config_evidence": "analysis/evidence/embedded-remote-config.REDACTED.json",
+    "triage_output": "analysis/evidence/apk-dramalive/",
+    "web_build_analysis": "docs/01-RECON-WEB.md",
+    "security_findings": "docs/07-HALLAZGOS-SEGURIDAD.md",
+    "generation_split": "El APK (nativo Kotlin, backend eastgoessouth.online, HTTP) y la PWA (Flutter, backend fastconnections.online, HTTPS) son DOS generaciones distintas del mismo producto. Ver docs/02-ARQUITECTURA.md §1."
+  },
+  "output": {
+    "format": "markdown",
+    "language": "es",
+    "directory": "analysis/evidence/",
+    "per_finding_required": [
+      "class_and_method",
+      "decompiled_snippet",
+      "dex_and_offset",
+      "confidence: confirmed|inferred|speculative",
+      "if_speculative: what_would_refute_it"
+    ]
+  },
+  "tooling": {
+    "available": ["unzip", "python3", "androguard 4.1.4", "java"],
+    "to_install": ["apktool", "jadx", "aapt2"],
+    "already_run": ["analysis/scripts/apk_triage.sh dramalive.apk"]
+  }
+}

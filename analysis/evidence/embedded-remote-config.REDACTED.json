@@ -1,0 +1,112 @@
+{
+  "appVersionModel": {
+    "app_version": "13.0.3",
+    "androidAppVersion": "13.0.3",
+    "iosAppVersion": "1.0",
+    "forceUpdate": false,
+    "update_url": "https://dataflowstation.net/download/g/dramalive",
+    "update_url_direct": "https://dataflowstation.net/download/g/dramalive",
+    "update_message": "New update is available",
+    "update_message_ar": "يتوفر تحديث جديد للتطبيق",
+    "update_message_fr": "Une nouvelle mise à jour est disponible"
+  },
+  "serverSettingsModel": {
+    "server_url": "http://main.eastgoessouth.online/api/live/livedrama/v13.0.0/",
+    "sport_server_url": "http://sport.eastgoessouth.online/sport/",
+    "file_server_url": "http://file.twoapistack.work/",
+    "xmpp_ip": "fire.eastgoessouth.online",
+    "tutorial_video": "https://www.youtube.com/c/DramaLive7",
+    "fgcode_url": "fgcode.org",
+    "admin_email": "[[REDACTED-PII]]",
+    "admin_email_paid": "[[REDACTED-PII]]",
+    "smart_search_url": "http://shows.eastgoessouth.online/search/v3/",
+    "redirect_url": "http://redirect.eastgoessouth.online/redirect/",
+    "live_url": "http://live.eastgoessouth.online/api/live/livedrama/v13.0.0/",
+    "log_url": "http://log.eastgoessouth.online/api/live/livedrama/v9.0.0/",
+    "banned_apps": [
+      "com.dramatvesp.rgyptemtkdh",
+      "com.app.dramalivetvplayer",
+      "com.drama_live.drama_live_tv_apk",
+      "drama.live.tv",
+      "net.dramalive.tvplayer",
+      "com.app.dramatvforyou",
+      "com.dramalive23",
+      "com.dramatv01",
+      "com.app.dramalivearabeforu",
+      "com.app.dramatelfaziback",
+      "com.app.dramaarabictv",
+      "app2022.mopikora1122",
+      "app2022.yallashootelive1122",
+      "shabaktytv22022.app",
+      "app2022.elastooralive332022",
+      "ostorakora112022.app",
+      "yacinetv2022live2211.app",
+      "qata22022rfifa2022.app",
+      "dramalive2022.app",
+      "dramakivee10120.app",
+      "dramakivee10110.app",
+      "com.dramalive.footballlive",
+      "app2022.livedrama11",
+      "com.matches.football.livesfootball",
+      "app2022.yasinetvlive11"
+    ],
+    "chat_http_url": "http://chat.eastgoessouth.online/chat/api/",
+    "crash_reporting_url": "http://crash2.semprotech.online:8080/report",
+    "crash_reporting_login": "[[REDACTED-CREDENTIAL — see docs/07-HALLAZGOS-SEGURIDAD.md#f-01]]",
+    "crash_reporting_password": "[[REDACTED-CREDENTIAL — see docs/07-HALLAZGOS-SEGURIDAD.md#f-01]]",
+    "privacy_policy_url": "https://dramalive.app/privacy.htm",
+    "legal_url": "https://dramalive.app/legal.php",
+    "faqs_url": "https://dramalive.app/faqs.php",
+    "business_url": "https://dramalive.app/business.php",
+    "support_email": "support@dramalive.org"
+  },
+  "mainServerModelArraylist": [
+    {
+      "url": "http://main.backendcoreapi.com/api/live/livedrama/v13.0.0/",
+      "checked": false
+    },
+    {
+      "url": "http://main.swiftapi.org/api/live/livedrama/v13.0.0/",
+      "checked": false
+    },
+    {
+      "url": "http://[[REDACTED-INFRA-IP — AWS eu-central-1, see finding F-03]]/api/live/livedrama/v13.0.0/",
+      "checked": false
+    },
+    {
+      "url": "http://dramalive.app:8787/api/live/livedrama/v13.0.0/",
+      "checked": false
+    }
+  ],
+  "socialModelArraylist": [
+    {
+      "title": "Telegram",
+      "image": "http://file.twoapistack.work/live/img/social/ic_telegram.png",
+      "url": "https://t.me/DramaLive9"
+    },
+    {
+      "title": "Youtube",
+      "image": "http://file.twoapistack.work/live/img/social/ic_youtube.png",
+      "url": "https://www.youtube.com/c/DramaLive7"
+    }
+  ],
+  "adsModel": {
+    "home_ban": "nactive",
+    "live_ban": "nactive",
+    "all_int": "nactive",
+    "time_int": "5",
+    "home_nat": "nactive",
+    "live_nat": "nactive",
+    "sport_nat": "nactive",
+    "billing_available": false,
+    "coupon_available": false,
+    "coupon_active": false,
+    "coupon_end_date": ""
+  },
+  "modModel": {
+    "mod_ar": "",
+    "mod_en": "",
+    "mod_url": null
+  },
+  "fg_active": true
+}

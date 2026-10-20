@@ -1,0 +1,46 @@
+MIT License
+
+Copyright (c) 2026 dramalive-analysis contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+NOTA SOBRE EL ALCANCE DE ESTA LICENCIA
+
+Esta licencia cubre únicamente el código y los textos escritos para este
+repositorio: el backend de referencia (`backend/`), el cliente réplica
+(`client/`), las herramientas de análisis (`analysis/`) y la documentación
+(`docs/`).
+
+NO cubre, y este repositorio no contiene ni distribuye:
+
+  • el APK, el bundle JavaScript, los binarios ni cualquier otro artefacto de
+    Drama Live o de sus autores (todo ello excluido vía `.gitignore`);
+  • el código, los assets, el logotipo, los iconos, los textos localizados ni
+    el catálogo de contenido del producto analizado;
+  • credenciales, tokens ni datos personales de terceros.
+
+Los nombres "Drama Live", "DramaLive" y los dominios citados en la
+documentación pertenecen a sus respectivos titulares y se usan aquí solo para
+identificar el objeto del análisis, en uso descriptivo.
+
+El análisis publicado en `docs/` se ofrece con fines de investigación,
+docencia e interoperabilidad. Antes de reutilizarlo, lee
+`docs/00-LEGAL-Y-ALCANCE.md`. Nada de lo anterior constituye asesoría legal.

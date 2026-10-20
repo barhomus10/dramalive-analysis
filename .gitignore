@@ -1,0 +1,113 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Artefactos de terceros. NO se versionan nunca.
+#
+# Son binarios y builds que no nos pertenecen: el APK analizado, el bundle JS
+# de la PWA y todo lo que se derive de descomprimirlos. Este repo publica el
+# ANÁLISIS, no los artefactos. Reproducirlos es trivial con los scripts de
+# analysis/. Ver docs/00-LEGAL-Y-ALCANCE.md §5.
+# ─────────────────────────────────────────────────────────────────────────────
+artifacts/
+
+# Por si alguien coloca el APK en otra ruta
+*.apk
+*.aab
+*.apks
+*.xapk
+*.dex
+*.so
+*.jar
+*.aar
+
+# Bundles descargados del sitio
+main.dart.js
+flutter_bootstrap.js
+flutter.js
+flutter_service_worker.js
+AssetManifest*.json
+
+# Salidas de descompilación
+apktool/
+jadx/
+smali/
+*.smali
+decompiled/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Secretos y datos capturados. Nunca.
+# ─────────────────────────────────────────────────────────────────────────────
+*.env
+.env*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+credentials.json
+secrets.*
+token*
+*.token
+captures/
+*.har
+*.pcap
+*.pcapng
+*.saz
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Toolchain
+# ─────────────────────────────────────────────────────────────────────────────
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Flutter / Dart
+client/.dart_tool/
+client/.flutter-plugins
+client/.flutter-plugins-dependencies
+client/.packages
+client/build/
+client/.pub-cache/
+client/.pub/
+client/ios/Pods/
+client/ios/.symlinks/
+client/android/.gradle/
+client/android/local.properties
+client/android/key.properties
+client/android/app/upload-keystore.jks
+client/**/GeneratedPluginRegistrant.*
+client/coverage/
+*.lock
+
+# Gradle / Android (si se genera la carpeta android/)
+client/android/app/release/
+client/android/app/debug/
+.gradle/
+local.properties
+
+# Editores / SO
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json.example
+*.swp
+*.swo
+*~
+.directory
+
+# Temporal del propio tooling de análisis
+/tmp/
+*.log
+analysis/evidence/apk-*/01-INVENTARIO.md.bak

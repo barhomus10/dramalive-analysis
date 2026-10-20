@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Drama Live — réplica de análisis</title>
+<style>
+  /* Paleta tomada del splash PÚBLICO de web.dramalive.cc/index.html:
+       bg  linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)   acento #e94560
+     No se copian logotipo, iconos ni textos del producto original. */
+  :root{
+    --bg:#1a1a2e; --bg2:#16213e; --bg3:#0f3460; --accent:#e94560;
+    --tx:#fff; --tx2:rgba(255,255,255,.62); --warn:#ffb300; --line:rgba(255,255,255,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:linear-gradient(135deg,var(--bg) 0%,var(--bg2) 50%,var(--bg3) 100%);
+    background-attachment:fixed;color:var(--tx);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+  header{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:6px 0 18px;border-bottom:1px solid var(--line);margin-bottom:18px}
+  .mark{width:42px;height:42px;border-radius:12px;background:var(--bg3);display:grid;place-items:center;border:1px solid var(--line);flex:none}
+  h1{font-size:19px;font-weight:700;letter-spacing:.2px}
+  .sub{font-size:12.5px;color:var(--tx2)}
+  .spacer{flex:1}
+  .pill{font-size:11.5px;color:var(--tx2);border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:rgba(0,0,0,.18)}
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:18px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:rgba(22,33,62,.72);border:1px solid var(--line);border-radius:14px;padding:15px}
+  .card h2{font-size:11.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--tx2);font-weight:700;margin-bottom:11px}
+  label{display:block;font-size:11.5px;color:var(--tx2);margin:10px 0 4px}
+  input,select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--tx);padding:10px 11px;font:inherit;font-size:14px}
+  input:focus,select:focus{outline:none;border-color:var(--accent)}
+  button{background:var(--accent);border:0;color:#fff;font:inherit;font-weight:600;padding:11px 16px;border-radius:11px;cursor:pointer;width:100%;margin-top:12px}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--tx2);font-weight:500}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .row{display:flex;gap:8px;align-items:center}
+  .st{font-size:12.5px;color:var(--tx2);min-height:18px;margin-top:9px;word-break:break-word}
+  .st.err{color:var(--accent)}
+  .st.ok{color:#7ee081}
+  .banner{background:rgba(255,179,0,.14);border:1px solid rgba(255,179,0,.4);color:var(--warn);border-radius:11px;padding:9px 12px;font-size:12.5px;margin-bottom:14px;display:none}
+  .banner.show{display:block}
+  .toolbar{display:flex;gap:9px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .toolbar input{flex:1;min-width:170px;margin:0}
+  .chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:9px;scrollbar-width:thin}
+  .chip{flex:none;font-size:12.5px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--tx2);cursor:pointer;white-space:nowrap}
+  .chip.on{border-color:var(--accent);background:rgba(233,69,96,.2);color:var(--tx)}
+  .list{display:grid;gap:6px;max-height:58vh;overflow:auto;padding-right:3px}
+  .item{display:flex;gap:11px;align-items:center;background:var(--bg2);border:1px solid transparent;border-radius:12px;padding:9px 11px;cursor:pointer}
+  .item:hover{border-color:var(--accent)}
+  .logo{width:42px;height:42px;border-radius:9px;background:var(--bg3);display:grid;place-items:center;color:var(--tx2);font-weight:700;flex:none;overflow:hidden}
+  .logo img{width:100%;height:100%;object-fit:cover}
+  .nm{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mt{font-size:11.5px;color:var(--tx2)}
+  .now{font-size:12px;color:var(--accent)}
+  video{width:100%;background:#000;border-radius:12px;aspect-ratio:16/9}
+  .empty{color:var(--tx2);text-align:center;padding:44px 16px;font-size:13.5px;line-height:1.7}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  td,th{text-align:left;padding:5px 7px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--tx2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+  td.v{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;word-break:break-all}
+  .note{font-size:12px;color:var(--tx2);line-height:1.6;margin-top:11px}
+  .note b{color:var(--tx)}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(0,0,0,.3);padding:1px 5px;border-radius:5px}
+  footer{margin-top:22px;padding-top:15px;border-top:1px solid var(--line);font-size:11.5px;color:var(--tx2);line-height:1.7}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e94560" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 3l4 4 4-4"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Réplica de análisis — cliente web</h1>
+      <div class="sub">Contrato Xtream Codes <code>player_api.php</code> · demo / demo</div>
+    </div>
+    <div class="spacer"></div>
+    <span class="pill" id="pillBackend">backend: —</span>
+    <span class="pill" id="pillState">sin cargar</span>
+  </header>
+
+  <div class="banner" id="banner"></div>
+
+  <div class="grid">
+    <!-- ─────────────────────────── columna izquierda ─────────────────────────── -->
+    <div>
+      <div class="card">
+        <h2>Fuente</h2>
+        <label for="backend">Base del backend</label>
+        <input id="backend" value="/backend" spellcheck="false"
+               title="Ruta relativa al backend de referencia. Cambia a http://localhost:8080 si lo sirves aparte.">
+        <label for="user">Usuario</label>
+        <input id="user" value="demo" autocomplete="off" spellcheck="false">
+        <label for="pass">Contraseña</label>
+        <input id="pass" type="password" value="demo" autocomplete="off">
+        <button id="btnLoad">Cargar catálogo</button>
+        <button class="ghost" id="btnHealth">Probar /health</button>
+        <div class="st" id="st"></div>
+        <div class="note">
+          Las credenciales se envían por <code>Authorization: Basic</code>, no por query
+          string. La app original las manda en la URL a un proxy de terceros
+          (<b>hallazgo F-02</b>).
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Sesión</h2>
+        <table id="sess"><tbody><tr><td class="v">—</td></tr></tbody></table>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Aviso</h2>
+        <div class="note">
+          Cliente independiente construido a partir del análisis de Drama Live v13.0.3.
+          No contiene código, assets ni contenido del producto original, y no consulta
+          su infraestructura.<br><br>
+          El reproductor recibe <b>segmentos MPEG-TS sintéticos</b> del backend de
+          referencia: estructuralmente válidos, sin imagen decodificable. Es a propósito —
+          este proyecto no redistribuye contenido de terceros. Para imagen real, activa
+          <code>PASSTHROUGH=1</code> con contenido del que tengas licencia, o apunta una
+          M3U propia.
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────── columna derecha ─────────────────────────── -->
+    <div>
+      <div class="card">
+        <h2>Reproductor</h2>
+        <video id="player" controls playsinline preload="none"></video>
+        <div class="st" id="stPlayer">Elige un canal.</div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Canales en directo</h2>
+        <div class="toolbar">
+          <input id="q" placeholder="Buscar…" autocomplete="off">
+          <span class="pill" id="count">0</span>
+        </div>
+        <div class="chips" id="chips"></div>
+        <div class="list" id="list">
+          <div class="empty">Carga una fuente para ver el catálogo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <b>dramalive-analysis</b> · cliente web de referencia ·
+    docs: <code>05-API.md</code> (contrato), <code>04-MODELO-FUENTES.md</code> (fuentes),
+    <code>07-HALLAZGOS-SEGURIDAD.md</code> (seguridad),
+    <code>00-LEGAL-Y-ALCANCE.md</code> (alcance legal).<br>
+    El cliente Flutter completo está en <code>client/</code>. Este HTML existe para poder
+    probar el contrato sin toolchain de Flutter.
+  </footer>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    backend: $('backend'), user: $('user'), pass: $('pass'),
+    btnLoad: $('btnLoad'), btnHealth: $('btnHealth'), st: $('st'),
+    banner: $('banner'), pillBackend: $('pillBackend'), pillState: $('pillState'),
+    sess: $('sess').querySelector('tbody'), q: $('q'), chips: $('chips'),
+    list: $('list'), count: $('count'), player: $('player'), stPlayer: $('stPlayer'),
+  };
+
+  let channels = [], categories = [], group = '__all__', epgCache = {};
+
+  const base = () => els.backend.value.replace(/\/+$/, '');
+
+  function status(msg, cls) {
+    els.st.textContent = msg || '';
+    els.st.className = 'st' + (cls ? ' ' + cls : '');
+  }
+  function pillState(t) { els.pillState.textContent = t; }
+
+  function warn(msg) {
+    if (!msg) { els.banner.classList.remove('show'); return; }
+    els.banner.textContent = msg;
+    els.banner.classList.add('show');
+  }
+
+  /* ------------------------------------------------------------------ HTTP */
+
+  /**
+   * GET con Authorization: Basic. Devuelve JSON.
+   * Lanza con mensaje legible, incluyendo el caso "el servidor devolvió HTML"
+   * que es lo que hace el backend real de la app original cuando la ruta no
+   * existe (docs/01-RECON-WEB.md §5.1).
+   */
+  async function getJSON(path, params = {}, { auth = true } = {}) {
+    const u = new URL(base() + path, location.href);
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') u.searchParams.set(k, v);
+    });
+    const headers = { Accept: 'application/json' };
+    if (auth && els.user.value) {
+      headers.Authorization = 'Basic ' +
+        btoa(unescape(encodeURIComponent(els.user.value + ':' + els.pass.value)));
+    }
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 15000);
+    let res;
+    try {
+      res = await fetch(u.toString(), { headers, signal: ctl.signal });
+    } catch (e) {
+      throw new Error('sin conexión con ' + u.host + ' — ¿está el backend en marcha? (' + e.message + ')');
+    } finally { clearTimeout(t); }
+
+    const text = await res.text();
+    if (res.status === 401) throw new Error('credenciales rechazadas (HTTP 401)');
+    if (res.status === 429) throw new Error('rate limit superado; reintenta en unos segundos');
+    if (res.status >= 400) {
+      let detail = 'HTTP ' + res.status;
+      try { const j = JSON.parse(text); detail += ' · ' + (j.message || j.error || ''); } catch (_) {}
+      throw new Error(detail);
+    }
+    if (text.trimStart().startsWith('<')) {
+      throw new Error('la respuesta es HTML, no JSON — la ruta ' + path + ' no existe en este backend');
+    }
+    try { return JSON.parse(text); } catch (_) { throw new Error('JSON inválido en ' + path); }
+  }
+
+  /* ------------------------------------------------------------- cleartext */
+
+  function checkCleartext() {
+    const b = base();
+    const absolute = /^https?:\/\//i.test(b);
+    if (absolute && b.startsWith('http://')) {
+      warn('⚠ Tráfico sin cifrar: ' + b + ' — tus credenciales viajan en claro. ' +
+           'Es exactamente el fallo F-02 del producto analizado.');
+      return true;
+    }
+    warn('');
+    return false;
+  }
+
+  /* --------------------------------------------------------------- session */
+
+  function renderSession(u, s) {
+    const rows = [];
+    if (u) {
+      const exp = Number(u.exp_date || 0);
+      rows.push(['usuario', u.username]);
+      rows.push(['auth', u.auth === 1 || u.auth === '1' ? 'sí' : 'no']);
+      rows.push(['estado', u.status]);
+      rows.push(['caduca', exp > 0 ? new Date(exp * 1000).toLocaleString('es') : 'sin caducidad']);
+      rows.push(['conexiones', (u.active_cons || '0') + ' / ' + (u.max_connections || '?')]);
+      rows.push(['formatos', (u.allowed_output_formats || []).join(', ')]);
+    }
+    if (s) {
+      rows.push(['servidor', (s.url || '') + ':' + (s.port || '')]);
+      rows.push(['protocolo', s.server_protocol || '']);
+      rows.push(['timezone', s.timezone || '']);
+    }
+    if (!rows.length) rows.push(['—', '']);
+    els.sess.innerHTML = rows.map(([k, v]) =>
+      `<tr><th>${esc(k)}</th><td class="v">${esc(String(v))}</td></tr>`).join('');
+  }
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ------------------------------------------------------------ categories */
+
+  function renderChips() {
+    const all = `<button class="chip ${group === '__all__' ? 'on' : ''}" data-g="__all__">Todos (${channels.length})</button>`;
+    els.chips.innerHTML = all + categories.map((c) => {
+      const n = channels.filter((x) => String(x.category_id) === String(c.category_id)).length;
+      return `<button class="chip ${group === c.category_id ? 'on' : ''}" data-g="${esc(c.category_id)}">${esc(c.category_name)} (${n})</button>`;
+    }).join('');
+    els.chips.querySelectorAll('.chip').forEach((b) =>
+      b.addEventListener('click', () => { group = b.dataset.g; renderChips(); renderList(); }));
+  }
+
+  /* ------------------------------------------------------------------ list */
+
+  function renderList() {
+    const q = els.q.value.trim().toLowerCase();
+    let v = group === '__all__' ? channels : channels.filter((c) => String(c.category_id) === group);
+    if (q) v = v.filter((c) => (c.name || '').toLowerCase().includes(q) || (c.epg_channel_id || '').toLowerCase().includes(q));
+
+    els.count.textContent = String(v.length);
+    if (!v.length) {
+      els.list.innerHTML = '<div class="empty">Sin resultados.</div>';
+      return;
+    }
+    els.list.innerHTML = v.map((c) => {
+      const epg = epgCache[c.stream_id];
+      const initial = (c.name || '?').trim()[0].toUpperCase();
+      const logo = c.stream_icon
+        ? `<img src="${esc(c.stream_icon)}" alt="" loading="lazy" onerror="this.remove()">`
+        : initial;
+      return `<div class="item" data-id="${esc(c.stream_id)}">
+        <div class="logo">${logo}</div>
+        <div style="min-width:0;flex:1">
+          <div class="nm">${esc(c.name)}</div>
+          ${epg ? `<div class="now">${esc(epg.now)}</div>` : ''}
+          <div class="mt">id ${esc(c.stream_id)}${c.tv_archive ? ' · catch-up ' + c.tv_archive_duration + 'd' : ''}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    els.list.querySelectorAll('.item').forEach((el) =>
+      el.addEventListener('click', () => play(el.dataset.id)));
+  }
+
+  /* ------------------------------------------------------------------- EPG */
+
+  /** base64 → texto, tolerante: si no era base64 devuelve la cadena tal cual. */
+  function b64(s) {
+    if (!s) return '';
+    try {
+      const d = decodeURIComponent(escape(atob(s)));
+      // heurística: base64 real no decodifica a caracteres de control
+      return /[\u0000-\u0008\u000e-\u001f]/.test(d) ? s : d;
+    } catch (_) { return s; }
+  }
+
+  async function loadEpg(id) {
+    if (epgCache[id]) return;
+    try {
+      const r = await getJSON('/player_api.php', {
+        username: els.user.value, password: els.pass.value,
+        action: 'get_short_epg', stream_id: id, limit: '2',
+      });
+      const list = (r && r.epg_listings) || [];
+      if (!list.length) return;
+      epgCache[id] = { now: b64(list[0].title), next: list[1] ? b64(list[1].title) : '' };
+      renderList();
+    } catch (_) { /* la EPG es decorativa */ }
+  }
+
+  /* ------------------------------------------------------------------ play */
+
+  function play(id) {
+    const c = channels.find((x) => String(x.stream_id) === String(id));
+    if (!c) return;
+    // Formato estándar Xtream. El backend de referencia ignora user/pass en la
+    // ruta; un panel real los valida.
+    const url = `${base()}/live/${encodeURIComponent(els.user.value)}/${encodeURIComponent(els.pass.value)}/${id}.m3u8`;
+    els.stPlayer.textContent = 'Cargando ' + c.name + ' …';
+    els.stPlayer.className = 'st';
+    els.player.src = url;
+    const p = els.player.play();
+    if (p && p.catch) p.catch((e) => {
+      els.stPlayer.textContent = 'El reproductor no pudo decodificar: ' + e.message +
+        '. Esperado con los segmentos sintéticos del backend de referencia.';
+      els.stPlayer.className = 'st err';
+    });
+    els.player.addEventListener('error', () => {
+      els.stPlayer.textContent = 'Error de reproducción en ' + url +
+        '. Los segmentos generados son estructuralmente válidos pero sin video decodificable (a propósito).';
+      els.stPlayer.className = 'st err';
+    }, { once: true });
+    els.player.addEventListener('playing', () => {
+      els.stPlayer.textContent = 'Reproduciendo: ' + c.name;
+      els.stPlayer.className = 'st ok';
+    }, { once: true });
+    loadEpg(id);
+  }
+
+  /* ------------------------------------------------------------- acciones */
+
+  async function load() {
+    checkCleartext();
+    els.btnLoad.disabled = true;
+    pillState('cargando…');
+    status('Contactando ' + base() + ' …');
+    els.pillBackend.textContent = 'backend: ' + base();
+    try {
+      const hand = await getJSON('/player_api.php', {
+        username: els.user.value, password: els.pass.value,
+      });
+      renderSession(hand.user_info, hand.server_info);
+      if (!hand.user_info || hand.user_info.auth !== 1) {
+        throw new Error('el panel no autenticó la cuenta (auth != 1)');
+      }
+
+      const [cats, streams] = await Promise.all([
+        getJSON('/player_api.php', { username: els.user.value, password: els.pass.value, action: 'get_live_categories' }),
+        getJSON('/player_api.php', { username: els.user.value, password: els.pass.value, action: 'get_live_streams' }),
+      ]);
+
+      categories = Array.isArray(cats) ? cats : [];
+      channels = Array.isArray(streams) ? streams : [];
+      group = '__all__';
+      epgCache = {};
+
+      renderChips();
+      renderList();
+
+      const expired = hand.user_info.exp_date > 0 &&
+        Number(hand.user_info.exp_date) * 1000 < Date.now();
+      if (expired) warn('La cuenta del panel está caducada.');
+
+      status(`OK · ${channels.length} canales en ${categories.length} categorías`, 'ok');
+      pillState(channels.length + ' canales');
+      if (channels.length) loadEpg(channels[0].stream_id);
+    } catch (e) {
+      status(e.message, 'err');
+      pillState('error');
+      renderSession(null, null);
+    } finally {
+      els.btnLoad.disabled = false;
+    }
+  }
+
+  async function health() {
+    checkCleartext();
+    status('GET /health …');
+    try {
+      const h = await getJSON('/health', {}, { auth: false });
+      const c = h.catalog || {};
+      status(`OK · ${c.live} live, ${c.vod} vod, ${c.series} series · passthrough=${h.passthrough} · node ${h.node}`, 'ok');
+    } catch (e) {
+      status(e.message, 'err');
+    }
+  }
+
+  els.btnLoad.addEventListener('click', load);
+  els.btnHealth.addEventListener('click', health);
+  els.q.addEventListener('input', renderList);
+  els.backend.addEventListener('change', checkCleartext);
+
+  /* Arranque: si el backend está servido bajo /backend (el Makefile lo hace),
+     se intenta cargar solo. */
+  els.pillBackend.textContent = 'backend: ' + base();
+  checkCleartext();
+  health().then(() => { if (!els.st.className.includes('err')) load(); });
+})();
+</script>
+</body>
+</html>
